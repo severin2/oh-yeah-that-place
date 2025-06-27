@@ -9,9 +9,12 @@ import {
 } from "react-native";
 import MapView, { Marker, LongPressEvent } from "react-native-maps";
 import * as Location from "expo-location";
-import { trpc } from "@/api/trpc";
+import { useTRPC, useTRPCClient } from "@/api/trpc";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export function MapScreen() {
+  const trpc = useTRPC();
+
   const [location, setLocation] =
     useState<Location.LocationObjectCoords | null>(null);
   const [regionReady, setRegionReady] = useState(false);
@@ -23,14 +26,8 @@ export function MapScreen() {
   const [note, setNote] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
 
-  const { data: notes, refetch: refetchNotes } =
-    trpc.placeNote.getNotes.useQuery();
-
-  const addNote = trpc.placeNote.addNote.useMutation();
-
-  useEffect(() => {
-    refetchNotes();
-  }, []);
+  const { data: notes } = useQuery(trpc.placeNote.getNotes.queryOptions());
+  const addNote = useMutation(trpc.placeNote.addNote.mutationOptions());
 
   useEffect(() => {
     (async () => {
@@ -63,8 +60,6 @@ export function MapScreen() {
       latitude: selectedCoord.latitude,
       longitude: selectedCoord.longitude,
     });
-
-    refetchNotes();
 
     setModalVisible(false);
     setTitle("");
