@@ -14,14 +14,15 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
+    "@types/morgan": "^1.9.10",
     "@types/node": "^24.0.4",
     "typescript": "^5.8.3"
   },
   "dependencies": {
     "@trpc/server": "^11.4.2",
-    "@types/morgan": "^1.9.10",
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "morgan": "^1.10.0",
     "superjson": "^2.2.2",
     "tsx": "^4.20.3",
     "uuid": "^11.1.0",

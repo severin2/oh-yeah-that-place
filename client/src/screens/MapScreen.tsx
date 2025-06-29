@@ -1,42 +1,29 @@
-import React, { use, useEffect, useState } from "react";
-import {
-  View,
-  Alert,
-  TextInput,
-  Button,
-  Modal,
-  StyleSheet,
-} from "react-native";
-import MapView, { Marker, LongPressEvent } from "react-native-maps";
-import * as Location from "expo-location";
-import { useTRPC, useTRPCClient } from "@/api/trpc";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import React, { use, useEffect, useState } from 'react';
+import { View, Alert, Modal, StyleSheet } from 'react-native';
+import MapView, { Marker, LongPressEvent } from 'react-native-maps';
+import * as Location from 'expo-location';
+import { useTRPC, useTRPCClient } from '@/api/trpc';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { NoteForm } from '../components/NoteForm';
 
 export function MapScreen() {
-  const trpc = useTRPC();
+  const trpc = useTRPC(); // use `import { trpc } from './utils/trpc'` if you're using the singleton pattern
+  const { data: notes, refetch: refetchNotes } = useQuery(trpc.placeNote.getNotes.queryOptions());
+  const addNote = useMutation(trpc.placeNote.addNote.mutationOptions());
 
-  const [location, setLocation] =
-    useState<Location.LocationObjectCoords | null>(null);
+  const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
   const [regionReady, setRegionReady] = useState(false);
   const [selectedCoord, setSelectedCoord] = useState<{
     latitude: number;
     longitude: number;
   } | null>(null);
-  const [title, setTitle] = useState("");
-  const [note, setNote] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
-
-  const { data: notes } = useQuery(trpc.placeNote.getNotes.queryOptions());
-  const addNote = useMutation(trpc.placeNote.addNote.mutationOptions());
 
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(
-          "Permission denied",
-          "Location permission is required to use this feature."
-        );
+      if (status !== 'granted') {
+        Alert.alert('Permission denied', 'Location permission is required to use this feature.');
         return;
       }
 
@@ -51,19 +38,31 @@ export function MapScreen() {
     setModalVisible(true);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async ({
+    title,
+    note,
+    notifyEnabled,
+    notifyDistance,
+  }: {
+    title: string;
+    note: string;
+    notifyEnabled: boolean;
+    notifyDistance: number;
+  }) => {
     if (!selectedCoord) return;
 
-    addNote.mutate({
+    await addNote.mutate({
       title,
       note,
+      notifyEnabled,
+      notifyDistance,
       latitude: selectedCoord.latitude,
       longitude: selectedCoord.longitude,
     });
 
+    await refetchNotes();
+    setSelectedCoord(null);
     setModalVisible(false);
-    setTitle("");
-    setNote("");
   };
 
   return (
@@ -82,38 +81,27 @@ export function MapScreen() {
           }}
         >
           {selectedCoord && <Marker coordinate={selectedCoord} />}
+          {notes?.map((n) => (
+            <Marker
+              key={n.id}
+              coordinate={{ latitude: n.latitude, longitude: n.longitude }}
+              title={n.title}
+              description={n.note}
+            />
+          ))}
         </MapView>
       )}
 
-      {notes?.map((n) => (
-        <Marker
-          key={n.id}
-          coordinate={{ latitude: n.latitude, longitude: n.longitude }}
-          title={n.title}
-          description={n.note}
-        />
-      ))}
-
       <Modal
         visible={modalVisible}
-        animationType="slide"
+        animationType='slide'
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modal}>
-          <TextInput
-            placeholder="Title"
-            style={styles.input}
-            value={title}
-            onChangeText={setTitle}
-          />
-          <TextInput
-            placeholder="Note"
-            style={styles.input}
-            value={note}
-            onChangeText={setNote}
-          />
-          <Button title="Save Note" onPress={handleSubmit} />
-        </View>
+        <NoteForm
+          onSubmit={handleSubmit}
+          onCancel={() => setModalVisible(false)}
+          submitting={addNote.isPending}
+        />
       </Modal>
     </View>
   );
@@ -125,7 +113,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   input: {
-    borderColor: "#ccc",
+    borderColor: '#ccc',
     borderWidth: 1,
     padding: 12,
     marginBottom: 12,

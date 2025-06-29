@@ -1,28 +1,17 @@
-import express from "express";
-import cors from "cors";
-import { createExpressMiddleware } from "@trpc/server/adapters/express";
-import morgan from "morgan";
-import { placeNoteRouter } from "./routes/placeNote";
-import { transformer } from "@shared/transformers"; // Adjust the import path as necessary
-import { initTRPC } from "@trpc/server";
-
-const t = initTRPC.create({
-  transformer,
-});
-
-export const appRouter = t.router({
-  placeNote: placeNoteRouter,
-});
-
-export type AppRouter = typeof appRouter;
+import express from 'express';
+import cors from 'cors';
+import { createExpressMiddleware } from '@trpc/server/adapters/express';
+import morgan from 'morgan';
+import { appRouter } from './routes';
+export { AppRouter } from './routes';
 
 const app = express();
-app.use(morgan("dev"));
+app.use(morgan('dev'));
 app.use(cors());
 app.use(express.json());
 
 app.use(
-  "/trpc",
+  '/trpc',
   createExpressMiddleware({
     router: appRouter,
     createContext: () => ({}),

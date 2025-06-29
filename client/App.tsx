@@ -1,22 +1,22 @@
-import React, { useState } from "react";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import superjson from "superjson";
-import Constants from "expo-constants";
-import { MapScreen } from "./src/screens/MapScreen";
-import { createTRPCClient, httpBatchLink, httpLink } from "@trpc/client";
-import { transformer } from "@shared/transformers"; // Adjust the import path as necessary
-import { AppRouter } from "@server/index";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
-import { TRPCProvider } from "@/api/trpc";
+import { TRPCProvider } from '@/api/trpc';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { AppRouter } from '@server/index';
+import { transformer } from '@shared/transformers'; // Adjust the import path as necessary
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createTRPCClient, httpBatchLink, httpLink, loggerLink } from '@trpc/client';
+import Constants from 'expo-constants';
+import React, { useState } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { MapScreen } from './src/screens/MapScreen';
 
 const Stack = createNativeStackNavigator();
 
 const getBaseUrl = () => {
-  return Constants.expoConfig?.extra?.API_URL ?? "http://localhost:4000";
+  return process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:4000';
 };
+
+console.log('API URL:', getBaseUrl());
 
 function makeQueryClient() {
   return new QueryClient({
@@ -31,7 +31,7 @@ function makeQueryClient() {
 }
 let browserQueryClient: QueryClient | undefined = undefined;
 function getQueryClient() {
-  if (typeof window === "undefined") {
+  if (typeof window === 'undefined') {
     // Server: always make a new query client
     return makeQueryClient();
   } else {
@@ -49,6 +49,9 @@ export default function App() {
   const [trpcClient] = useState(() =>
     createTRPCClient<AppRouter>({
       links: [
+        loggerLink({
+          colorMode: 'none',
+        }),
         httpBatchLink({
           url: `${getBaseUrl()}/trpc`,
           transformer,
@@ -58,15 +61,15 @@ export default function App() {
   );
   return (
     <SafeAreaProvider>
-      <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
-        <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
           <NavigationContainer>
             <Stack.Navigator>
-              <Stack.Screen name="Map" component={MapScreen} />
+              <Stack.Screen name='Map' component={MapScreen} />
             </Stack.Navigator>
           </NavigationContainer>
-        </QueryClientProvider>
-      </TRPCProvider>
+        </TRPCProvider>
+      </QueryClientProvider>
     </SafeAreaProvider>
   );
 }

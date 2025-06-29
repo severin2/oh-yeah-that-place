@@ -1,36 +1,18 @@
-import { z } from "zod";
-import { v4 as uuidv4 } from "uuid";
-import { PlaceNoteSchema } from "@shared/placeNote";
-import { initTRPC } from "@trpc/server";
+import { z } from 'zod';
+import { v4 as uuidv4 } from 'uuid';
+import { PlaceNoteSchema } from '@shared/placeNote';
+import { initTRPC } from '@trpc/server';
 
 const t = initTRPC.create();
 
-const loggingMiddleware = t.middleware(
-  async ({ path, type, next, getRawInput }) => {
-    console.log(`[tRPC] ${type.toUpperCase()} ${path}`);
-    if (type === "mutation") {
-      console.log("→ input:", getRawInput());
-    }
-
-    const result = await next();
-
-    if (result.ok) {
-      console.log("← result:", result.data);
-    } else {
-      console.log("← error:", result.error);
-    }
-
-    return result;
-  }
-);
-
 export const placeNoteRouter = t.router({
   addNote: t.procedure
-    .use(loggingMiddleware)
     .input(
       z.object({
         title: z.string(),
         note: z.string().optional(),
+        notifyEnabled: z.boolean().default(true),
+        notifyDistance: z.number().default(1609), // about a mile
         latitude: z.number(),
         longitude: z.number(),
       })
@@ -41,6 +23,8 @@ export const placeNoteRouter = t.router({
         id: uuidv4(),
         title: input.title,
         note: input.note,
+        notifyEnabled: input.notifyEnabled,
+        notifyDistance: input.notifyDistance,
         latitude: input.latitude,
         longitude: input.longitude,
         createdAt: new Date(),
@@ -49,7 +33,8 @@ export const placeNoteRouter = t.router({
       return newNote;
     }),
 
-  getNotes: t.procedure.use(loggingMiddleware).query(() => {
+  getNotes: t.procedure.query(() => {
+    console.log(memoryStore);
     return memoryStore;
   }),
 });
