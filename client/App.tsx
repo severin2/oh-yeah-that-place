@@ -1,22 +1,16 @@
+import React, { useState } from 'react';
 import { TRPCProvider } from '@/api/trpc';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AppRouter } from '@server/index';
 import { transformer } from '@shared/transformers'; // Adjust the import path as necessary
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createTRPCClient, httpBatchLink, httpLink, loggerLink } from '@trpc/client';
-import Constants from 'expo-constants';
-import React, { useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { MapScreen } from './src/screens/MapScreen';
-
-const Stack = createNativeStackNavigator();
+import { TabNavigator } from '@/navigation/TabNavigator';
 
 const getBaseUrl = () => {
   return process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:4000';
 };
-
-console.log('API URL:', getBaseUrl());
 
 function makeQueryClient() {
   return new QueryClient({
@@ -59,14 +53,13 @@ export default function App() {
       ],
     })
   );
+
   return (
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
         <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
           <NavigationContainer>
-            <Stack.Navigator>
-              <Stack.Screen name='Map' component={MapScreen} />
-            </Stack.Navigator>
+            <TabNavigator />
           </NavigationContainer>
         </TRPCProvider>
       </QueryClientProvider>

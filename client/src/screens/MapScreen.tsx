@@ -1,9 +1,9 @@
-import React, { use, useEffect, useState } from 'react';
-import { View, Alert, Modal, StyleSheet } from 'react-native';
-import MapView, { Marker, LongPressEvent } from 'react-native-maps';
-import * as Location from 'expo-location';
-import { useTRPC, useTRPCClient } from '@/api/trpc';
+import { useTRPC } from '@/api/trpc';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import * as Location from 'expo-location';
+import React, { useEffect, useState } from 'react';
+import { Alert, Modal, StyleSheet, View } from 'react-native';
+import MapView, { LongPressEvent, Marker } from 'react-native-maps';
 import { NoteForm } from '../components/NoteForm';
 
 export function MapScreen() {
@@ -119,3 +119,5 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 });
+
+export default MapScreen;
