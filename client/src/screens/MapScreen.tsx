@@ -1,14 +1,12 @@
 import { useTRPC } from '@/api/trpc';
+import { AddNoteModal } from '@/components/AddNoteModal';
+import { useNavigation } from '@react-navigation/native';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import * as Location from 'expo-location';
 import React, { useEffect, useState } from 'react';
-import { Alert, Modal, StyleSheet, View } from 'react-native';
+import { Alert, Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
 import MapView, { LongPressEvent, Marker } from 'react-native-maps';
-import { NoteForm } from '../components/NoteForm';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { NoteSearchForm } from '@/components/NoteSearchForm';
 
 enum ModalState {
   None,
@@ -112,12 +110,11 @@ export function MapScreen() {
         animationType='slide'
         onRequestClose={() => setModalState(ModalState.None)}
       >
-        <NoteSearchForm />
-        {/* <NoteForm
+        <AddNoteModal
           onSubmit={handleSubmit}
           onCancel={() => setModalState(ModalState.None)}
           submitting={addNote.isPending}
-        /> */}
+        />
       </Modal>
       <TouchableOpacity style={styles.fab} onPress={() => handleAddNotePress()} activeOpacity={0.7}>
         <Ionicons name='add' size={32} color='#fff' />

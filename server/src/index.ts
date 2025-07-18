@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import morgan from 'morgan';
-import { trpcRouter } from './routes';
+import { searchRouter, trpcRouter } from './routes';
 export { TrpcRouter } from './routes';
 
 const app = express();
@@ -17,6 +17,8 @@ app.use(
     createContext: () => ({}),
   })
 );
+
+app.use('/search', searchRouter);
 
 const port = 4000;
 app.listen(port, () => {
