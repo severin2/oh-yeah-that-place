@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { TRPCProvider } from '@/api/trpc';
 import { NavigationContainer } from '@react-navigation/native';
-import { AppRouter } from '@server/index';
+import { TrpcRouter } from '@server/index';
 import { transformer } from '@shared/transformers'; // Adjust the import path as necessary
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createTRPCClient, httpBatchLink, httpLink, loggerLink } from '@trpc/client';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { TabNavigator } from '@/navigation/TabNavigator';
+import { Navigation } from '@/navigation/TabNavigator';
 
 const getBaseUrl = () => {
   return process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:4000';
@@ -41,7 +41,7 @@ function getQueryClient() {
 export default function App() {
   const queryClient = getQueryClient();
   const [trpcClient] = useState(() =>
-    createTRPCClient<AppRouter>({
+    createTRPCClient<TrpcRouter>({
       links: [
         loggerLink({
           colorMode: 'none',
@@ -58,9 +58,7 @@ export default function App() {
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
         <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
-          <NavigationContainer>
-            <TabNavigator />
-          </NavigationContainer>
+          <Navigation />
         </TRPCProvider>
       </QueryClientProvider>
     </SafeAreaProvider>

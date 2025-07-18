@@ -5,6 +5,16 @@ import React, { useEffect, useState } from 'react';
 import { Alert, Modal, StyleSheet, View } from 'react-native';
 import MapView, { LongPressEvent, Marker } from 'react-native-maps';
 import { NoteForm } from '../components/NoteForm';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NoteSearchForm } from '@/components/NoteSearchForm';
+
+enum ModalState {
+  None,
+  ExistingNote,
+  NewNote,
+}
 
 export function MapScreen() {
   const trpc = useTRPC(); // use `import { trpc } from './utils/trpc'` if you're using the singleton pattern
@@ -17,7 +27,8 @@ export function MapScreen() {
     latitude: number;
     longitude: number;
   } | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [modalState, setModalState] = useState(ModalState.None);
+  const navigation = useNavigation();
 
   useEffect(() => {
     (async () => {
@@ -35,7 +46,11 @@ export function MapScreen() {
   const handleLongPress = (event: LongPressEvent) => {
     const { latitude, longitude } = event.nativeEvent.coordinate;
     setSelectedCoord({ latitude, longitude });
-    setModalVisible(true);
+    setModalState(ModalState.ExistingNote);
+  };
+
+  const handleAddNotePress = () => {
+    setModalState(ModalState.NewNote);
   };
 
   const handleSubmit = async ({
@@ -62,7 +77,7 @@ export function MapScreen() {
 
     await refetchNotes();
     setSelectedCoord(null);
-    setModalVisible(false);
+    setModalState(ModalState.None);
   };
 
   return (
@@ -93,16 +108,20 @@ export function MapScreen() {
       )}
 
       <Modal
-        visible={modalVisible}
+        visible={modalState !== ModalState.None}
         animationType='slide'
-        onRequestClose={() => setModalVisible(false)}
+        onRequestClose={() => setModalState(ModalState.None)}
       >
-        <NoteForm
+        <NoteSearchForm />
+        {/* <NoteForm
           onSubmit={handleSubmit}
-          onCancel={() => setModalVisible(false)}
+          onCancel={() => setModalState(ModalState.None)}
           submitting={addNote.isPending}
-        />
+        /> */}
       </Modal>
+      <TouchableOpacity style={styles.fab} onPress={() => handleAddNotePress()} activeOpacity={0.7}>
+        <Ionicons name='add' size={32} color='#fff' />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -117,6 +136,22 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 12,
     marginBottom: 12,
+  },
+  fab: {
+    position: 'absolute',
+    right: 24,
+    bottom: 32,
+    backgroundColor: '#007AFF',
+    borderRadius: 28,
+    width: 56,
+    height: 56,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });
 

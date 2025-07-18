@@ -6,8 +6,8 @@ const t = initTRPC.create({
   transformer,
 });
 
-export const appRouter = t.router({
+export const trpcRouter = t.router({
   placeNote: placeNoteRouter,
 });
 
-export type AppRouter = typeof appRouter;
+export type TrpcRouter = typeof trpcRouter;
