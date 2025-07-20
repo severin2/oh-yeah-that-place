@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  nominatim:
+    image: mediagis/nominatim:5.1
+    container_name: nominatim
+    ports:
+      - "8080:8080"
+    environment:
+      - PBF_URL=https://download.geofabrik.de/north-america-latest.osm.pbf
+      - REPLICATION_URL=https://download.geofabrik.de/europe/monaco-updates/
+    volumes:
+      - nominatim_data:/var/lib/postgresql/14/main
+      - nominatim_flatnode:/nominatim/flatnode
+    restart: unless-stopped
+    # Uncomment the following lines if you want to persist data
+    # volumes:
+    #   - ./data/postgres:/var/lib/postgresql/14/main
+    #   - ./data/flatnode:/nominatim/flatnode
+
+volumes:
+  nominatim_data:
+  nominatim_flatnode:

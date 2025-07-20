@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
-import { TRPCProvider } from '@/api/trpc';
-import { NavigationContainer } from '@react-navigation/native';
-import { TrpcRouter } from '@server/index';
-import { transformer } from '@shared/transformers'; // Adjust the import path as necessary
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { createTRPCClient, httpBatchLink, httpLink, loggerLink } from '@trpc/client';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { Navigation } from '@/navigation/TabNavigator';
+import React, { useState } from "react";
+import { TRPCProvider } from "@/api/trpc";
+import { TrpcRouter } from "@server/index";
+import { transformer } from "@shared/transformers"; // Adjust the import path as necessary
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { createTRPCClient, httpBatchLink, loggerLink } from "@trpc/client";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Navigation } from "@/navigation/TabNavigator";
 
 const getBaseUrl = () => {
-  return process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:4000';
+  return process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000";
 };
 
 function makeQueryClient() {
@@ -25,7 +24,7 @@ function makeQueryClient() {
 }
 let browserQueryClient: QueryClient | undefined = undefined;
 function getQueryClient() {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     // Server: always make a new query client
     return makeQueryClient();
   } else {
@@ -44,7 +43,7 @@ export default function App() {
     createTRPCClient<TrpcRouter>({
       links: [
         loggerLink({
-          colorMode: 'none',
+          colorMode: "none",
         }),
         httpBatchLink({
           url: `${getBaseUrl()}/trpc`,

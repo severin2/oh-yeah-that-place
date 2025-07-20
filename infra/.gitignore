@@ -1,0 +1,15 @@
+# Docker data directories (if using bind mounts)
+data/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Environment files (if you add any sensitive configs)
+.env.local
+.env.production
