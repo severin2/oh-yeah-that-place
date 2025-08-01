@@ -6,6 +6,7 @@
       "@/*": ["./src/*"],
       "@shared/*": ["../shared/src/*"],
       "@server/*": ["../server/src/*"]
-    }
+    },
+    "esModuleInterop": true
   }
 }

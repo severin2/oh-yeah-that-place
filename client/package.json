@@ -9,14 +9,9 @@
     "ios": "expo start --ios",
     "web": "expo start --web"
   },
-  "peerDependencies": {
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
-    "react-native": "0.79.4"
-  },
   "dependencies": {
     "@expo/metro-runtime": "~5.0.4",
-    "@react-native-community/slider": "^4.5.7",
+    "@react-native-community/slider": "^4.5.6",
     "@react-native-picker/picker": "^2.11.1",
     "@react-navigation/bottom-tabs": "^7.4.2",
     "@react-navigation/native": "^7.1.14",
@@ -28,6 +23,9 @@
     "expo": "~53.0.13",
     "expo-location": "^18.1.6",
     "expo-status-bar": "~2.2.3",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-native": "0.79.5",
     "react-native-gesture-handler": "^2.24.0",
     "react-native-maps": "^1.20.1",
     "react-native-reanimated": "^3.17.5",

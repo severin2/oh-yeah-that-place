@@ -1,7 +1,5 @@
-import { PlacesClient } from "@googlemaps/places";
-import { SearchResult } from "@shared/search";
-import dotenv from "dotenv";
-dotenv.config();
+import { PlacesClient } from '@googlemaps/places';
+import { SearchResult } from '@shared/search';
 
 interface GooglePlace {
   id: string;
@@ -50,23 +48,23 @@ interface GoogleSearchResponse {
 export class GooglePlacesService {
   private readonly placesClient: PlacesClient;
   private readonly fieldMask = [
-    "places.displayName",
-    "places.formattedAddress",
-    "places.location",
-    "places.types",
-    "places.rating",
-    "places.userRatingsTotal",
-    "places.currentOpeningHours",
-    "places.photos",
-    "places.iconUri",
-    "places.businessStatus",
-    "places.editorialSummary",
-  ].join(",");
+    'places.displayName',
+    'places.formattedAddress',
+    'places.location',
+    'places.types',
+    'places.rating',
+    'places.userRatingsTotal',
+    'places.currentOpeningHours',
+    'places.photos',
+    'places.iconUri',
+    'places.businessStatus',
+    'places.editorialSummary',
+  ].join(',');
 
   constructor() {
     const apiKey = process.env.GOOGLE_API_KEY;
     if (!apiKey) {
-      throw new Error("GOOGLE_API_KEY is not set in environment variables");
+      throw new Error('GOOGLE_API_KEY is not set in environment variables');
     }
     this.placesClient = new PlacesClient({
       apiKey,
@@ -82,20 +80,15 @@ export class GooglePlacesService {
     const [response] = await this.placesClient.searchText(request, {
       otherArgs: {
         headers: {
-          "X-Goog-FieldMask": this.fieldMask,
+          'X-Goog-FieldMask': this.fieldMask,
         },
       },
     });
 
-    return this.transformPlaceResults(
-      (response as GoogleSearchResponse).places || []
-    );
+    return this.transformPlaceResults((response as GoogleSearchResponse).places || []);
   }
 
-  async searchByLocation(
-    lat: number,
-    lng: number
-  ): Promise<SearchResult | null> {
+  async searchByLocation(lat: number, lng: number): Promise<SearchResult | null> {
     const request = {
       locationRestriction: {
         circle: {
@@ -112,7 +105,7 @@ export class GooglePlacesService {
     const [response] = await this.placesClient.searchNearby(request, {
       otherArgs: {
         headers: {
-          "X-Goog-FieldMask": this.fieldMask,
+          'X-Goog-FieldMask': this.fieldMask,
         },
       },
     });
@@ -124,9 +117,9 @@ export class GooglePlacesService {
   private transformPlaceResults(places: GooglePlace[]): SearchResult[] {
     return places.map((place) => ({
       placeId: place.id,
-      name: place.displayName?.text || "",
+      name: place.displayName?.text || '',
       types: place.types || [],
-      formattedAddress: place.formattedAddress || "",
+      formattedAddress: place.formattedAddress || '',
       geometry: {
         location: {
           lat: place.location?.latitude || 0,
@@ -139,11 +132,11 @@ export class GooglePlacesService {
         openNow: place.currentOpeningHours?.openNow || false,
       },
       photos: (place.photos || []).map((photo: any) => ({
-        photoReference: photo.name || "",
+        photoReference: photo.name || '',
       })),
-      icon: place.iconUri || "",
-      businessStatus: place.businessStatus || "",
-      description: place.editorialSummary?.text || "",
+      icon: place.iconUri || '',
+      businessStatus: place.businessStatus || '',
+      description: place.editorialSummary?.text || '',
     }));
   }
 }

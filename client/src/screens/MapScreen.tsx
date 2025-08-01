@@ -1,7 +1,6 @@
-import { useTRPC } from '@/api/trpc';
+import { trpc } from '@/api/trpc';
 import { AddNoteModal } from '@/components/AddNoteModal';
 import { useNavigation } from '@react-navigation/native';
-import { useMutation, useQuery } from '@tanstack/react-query';
 import * as Location from 'expo-location';
 import React, { useEffect, useState } from 'react';
 import { Alert, Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
@@ -15,9 +14,8 @@ enum ModalState {
 }
 
 export function MapScreen() {
-  const trpc = useTRPC(); // use `import { trpc } from './utils/trpc'` if you're using the singleton pattern
-  const { data: notes, refetch: refetchNotes } = useQuery(trpc.placeNote.getNotes.queryOptions());
-  const addNote = useMutation(trpc.placeNote.addNote.mutationOptions());
+  const { data: notes, refetch: refetchNotes } = trpc.placeNote.getNotes.useQuery();
+  const addNote = trpc.placeNote.addNote.useMutation();
 
   const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
   const [regionReady, setRegionReady] = useState(false);
@@ -64,7 +62,7 @@ export function MapScreen() {
   }) => {
     if (!selectedCoord) return;
 
-    await addNote.mutate({
+    await addNote.mutateAsync({
       title,
       note,
       notifyEnabled,
