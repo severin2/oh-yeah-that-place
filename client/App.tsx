@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { TRPCProvider } from "@/api/trpc";
 import { TrpcRouter } from "@server/index";
-import { transformer } from "@shared/transformers"; // Adjust the import path as necessary
+import { transformer } from "@shared/trpc/transformers";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createTRPCClient, httpBatchLink, loggerLink } from "@trpc/client";
 import { SafeAreaProvider } from "react-native-safe-area-context";

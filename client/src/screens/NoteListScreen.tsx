@@ -1,18 +1,26 @@
-import React from 'react';
-import { View, FlatList, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useTRPC } from '../api/trpc';
-import { useQuery } from '@tanstack/react-query';
-import { useNavigation } from '@react-navigation/native';
-import { PlaceNote } from '@shared/placeNote';
-import type { RootStackParamList } from '@/navigation/TabNavigator';
+import React from "react";
+import {
+  View,
+  FlatList,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import { useTRPC } from "../api/trpc";
+import { useQuery } from "@tanstack/react-query";
+import { useNavigation } from "@react-navigation/native";
+import { PlaceNote } from "@shared/trpc/placeNote";
+import type { RootStackParamList } from "@/navigation/TabNavigator";
 
 export function NoteListScreen() {
   const trpc = useTRPC();
-  const { data: notes, isLoading } = useQuery(trpc.placeNote.getNotes.queryOptions());
+  const { data: notes, isLoading } = useQuery(
+    trpc.placeNote.getNotes.queryOptions()
+  );
   const navigation = useNavigation<RootStackParamList>();
 
   const handleNotePress = (note: PlaceNote) => {
-    navigation.push('Details', {
+    navigation.push("Details", {
       note,
     });
   };
@@ -51,14 +59,14 @@ const styles = StyleSheet.create({
   },
   card: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     padding: 12,
     marginBottom: 12,
     borderRadius: 8,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   title: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 18,
     marginBottom: 4,
   },
@@ -68,7 +76,7 @@ const styles = StyleSheet.create({
   },
   coords: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
   },
 });
 
