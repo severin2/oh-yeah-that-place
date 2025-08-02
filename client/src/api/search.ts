@@ -1,34 +1,26 @@
-import type { SearchResponse, SearchResult } from "@shared/search";
-
-interface SearchOptions {
-  limit?: number;
-  countrycodes?: string;
-  bounded?: boolean;
-}
+import type { SearchResponse, SearchResult } from '@shared/search';
 
 export async function searchPlaces(query: string): Promise<SearchResult[]> {
   if (!query?.trim()) {
-    throw new Error("Search query cannot be empty");
+    throw new Error('Search query cannot be empty');
   }
 
   const params = new URLSearchParams({
     query: query.trim(),
-    limit: "10", // Default limit
+    limit: '10', // Default limit
   });
 
-  const url = `${
-    process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000"
-  }/search?${params}`;
+  const url = `${process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:4000'}/search?${params}`;
 
   try {
     const res = await fetch(url);
     const data = (await res.json()) as SearchResponse;
 
-    if (!res.ok || data.status === "ERROR") {
+    if (!res.ok || data.status === 'ERROR') {
       throw new Error(data.error || `Search failed with status ${res.status}`);
     }
 
-    if (data.status === "ZERO_RESULTS") {
+    if (data.status === 'ZERO_RESULTS') {
       return [];
     }
 
@@ -37,7 +29,7 @@ export async function searchPlaces(query: string): Promise<SearchResult[]> {
     if (error instanceof Error) {
       throw error;
     }
-    throw new Error("Failed to perform search");
+    throw new Error('Failed to perform search');
   }
 }
 
@@ -54,7 +46,7 @@ export async function getPlaceByCoordinates(
   });
 
   const url = `${
-    process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000"
+    process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:4000'
   }/search/reverse?${params}`;
 
   try {
@@ -70,6 +62,6 @@ export async function getPlaceByCoordinates(
     if (error instanceof Error) {
       throw error;
     }
-    throw new Error("Failed to get place details");
+    throw new Error('Failed to get place details');
   }
 }

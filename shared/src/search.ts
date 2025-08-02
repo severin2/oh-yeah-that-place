@@ -7,7 +7,7 @@ export type SearchResult = {
     location: { lat: number; lng: number };
   };
   rating: number;
-  userRatingsTotal: number;
+  userRatingCount: number;
   openingHours: { openNow: boolean };
   photos: { photoReference: string }[];
   icon: string;
@@ -17,7 +17,7 @@ export type SearchResult = {
 
 export type SearchResponse = {
   results: SearchResult[];
-  status: "OK" | "ZERO_RESULTS" | "INVALID_REQUEST" | "ERROR";
+  status: 'OK' | 'ZERO_RESULTS' | 'INVALID_REQUEST' | 'ERROR';
   error?: string;
 };
 
@@ -36,6 +36,6 @@ export type ReverseGeocodeQuery = {
 
 export type ReverseGeocodeResponse = {
   result: SearchResult | null;
-  status: "OK" | "ZERO_RESULTS" | "INVALID_REQUEST" | "ERROR";
+  status: 'OK' | 'ZERO_RESULTS' | 'INVALID_REQUEST' | 'ERROR';
   error?: string;
 };

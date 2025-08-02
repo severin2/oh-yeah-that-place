@@ -1,62 +1,21 @@
-import { PlacesClient } from '@googlemaps/places';
+import { PlacesClient, protos } from '@googlemaps/places';
 import { SearchResult } from '@shared/search';
 
-interface GooglePlace {
-  id: string;
-  displayName?: {
-    text: string;
-    languageCode?: string;
-  };
-  formattedAddress?: string;
-  location?: {
-    latitude: number;
-    longitude: number;
-  };
-  types?: string[];
-  rating?: number;
-  userRatingsTotal?: number;
-  currentOpeningHours?: {
-    openNow: boolean;
-    periods?: Array<{
-      open: { day: number; hour: number; minute: number };
-      close: { day: number; hour: number; minute: number };
-    }>;
-    weekdayDescriptions?: string[];
-  };
-  photos?: Array<{
-    name: string;
-    widthPx?: number;
-    heightPx?: number;
-    authorAttributions?: Array<{
-      displayName?: string;
-      uri?: string;
-      photoUri?: string;
-    }>;
-  }>;
-  iconUri?: string;
-  businessStatus?: string;
-  editorialSummary?: {
-    text: string;
-    languageCode?: string;
-  };
-}
-
-interface GoogleSearchResponse {
-  places: GooglePlace[];
-}
-
+type IPlace = protos.google.maps.places.v1.IPlace;
+type IPlaceWithId = IPlace & { id: string };
 export class GooglePlacesService {
   private readonly placesClient: PlacesClient;
   private readonly fieldMask = [
+    'places.id',
     'places.displayName',
     'places.formattedAddress',
     'places.location',
     'places.types',
     'places.rating',
-    'places.userRatingsTotal',
+    'places.userRatingCount',
     'places.currentOpeningHours',
     'places.photos',
-    'places.iconUri',
+    'places.iconMaskBaseUri',
     'places.businessStatus',
     'places.editorialSummary',
   ].join(',');
@@ -85,7 +44,7 @@ export class GooglePlacesService {
       },
     });
 
-    return this.transformPlaceResults((response as GoogleSearchResponse).places || []);
+    return this.transformPlaceResults(response.places || []);
   }
 
   async searchByLocation(lat: number, lng: number): Promise<SearchResult | null> {
@@ -110,12 +69,12 @@ export class GooglePlacesService {
       },
     });
 
-    const places = (response as GoogleSearchResponse).places || [];
+    const places = response.places || [];
     return places.length > 0 ? this.transformPlaceResults(places)[0] : null;
   }
 
-  private transformPlaceResults(places: GooglePlace[]): SearchResult[] {
-    return places.map((place) => ({
+  private transformPlaceResults(places: IPlace[]): SearchResult[] {
+    return places.filter(placeHasId).map((place) => ({
       placeId: place.id,
       name: place.displayName?.text || '',
       types: place.types || [],
@@ -127,18 +86,22 @@ export class GooglePlacesService {
         },
       },
       rating: place.rating || 0,
-      userRatingsTotal: place.userRatingsTotal || 0,
+      userRatingCount: place.userRatingCount || 0,
       openingHours: {
         openNow: place.currentOpeningHours?.openNow || false,
       },
       photos: (place.photos || []).map((photo: any) => ({
         photoReference: photo.name || '',
       })),
-      icon: place.iconUri || '',
-      businessStatus: place.businessStatus || '',
+      icon: place.iconMaskBaseUri || '',
+      businessStatus: `${place.businessStatus}` || '',
       description: place.editorialSummary?.text || '',
     }));
   }
+}
+
+function placeHasId(place: IPlace): place is IPlaceWithId {
+  return !!place.id;
 }
 
 export const googlePlacesService = new GooglePlacesService();

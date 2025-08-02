@@ -33,11 +33,18 @@ export function AddNoteModal({
 
   const { results, loading, error, search: performSearch } = usePlaceSearch();
 
+  // Debounce search input
+  React.useEffect(() => {
+    const handler = setTimeout(() => {
+      if (search.trim()) {
+        performSearch(search);
+      }
+    }, 400); // 400ms debounce
+    return () => clearTimeout(handler);
+  }, [search, performSearch]);
+
   const handleSearchChange = (text: string) => {
     setSearch(text);
-    if (text.trim()) {
-      performSearch(text);
-    }
   };
 
   const handleSelect = (item: SearchResult) => {
@@ -76,6 +83,8 @@ export function AddNoteModal({
                 >
                   <Text style={styles.resultText}>{item.name}</Text>
                   <Text style={styles.resultDescription}>{item.description}</Text>
+                  <Text style={styles.resultDescription}>{item.icon}</Text>
+                  <Text style={styles.resultDescription}>{item.placeId}</Text>
                 </TouchableOpacity>
               )}
               ListEmptyComponent={
