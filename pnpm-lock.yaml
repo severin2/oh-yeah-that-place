@@ -38,15 +38,6 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.81.2
         version: 5.84.1(react@19.0.0)
-      '@trpc/client':
-        specifier: ^11.4.2
-        version: 11.4.3(@trpc/server@11.4.3(typescript@5.8.3))(typescript@5.8.3)
-      '@trpc/react-query':
-        specifier: ^11.4.2
-        version: 11.4.3(@tanstack/react-query@5.84.1(react@19.0.0))(@trpc/client@11.4.3(@trpc/server@11.4.3(typescript@5.8.3))(typescript@5.8.3))(@trpc/server@11.4.3(typescript@5.8.3))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.8.3)
-      '@trpc/tanstack-react-query':
-        specifier: ^11.4.2
-        version: 11.4.3(@tanstack/react-query@5.84.1(react@19.0.0))(@trpc/client@11.4.3(@trpc/server@11.4.3(typescript@5.8.3))(typescript@5.8.3))(@trpc/server@11.4.3(typescript@5.8.3))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.8.3)
       expo:
         specifier: ~53.0.13
         version: 53.0.20(@babel/core@7.28.0)(@expo/metro-runtime@5.0.4(react-native@0.79.5(@babel/core@7.28.0)(@types/react@19.0.14)(react@19.0.0)))(react-native@0.79.5(@babel/core@7.28.0)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
@@ -86,9 +77,6 @@ importers:
       react-native-web:
         specifier: ^0.20.0
         version: 0.20.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      superjson:
-        specifier: ^2.2.2
-        version: 2.2.2
       zod:
         specifier: ^3.25.67
         version: 3.25.76
@@ -114,9 +102,6 @@ importers:
       '@googlemaps/places':
         specifier: ^2.1.0
         version: 2.1.0
-      '@trpc/server':
-        specifier: ^11.4.2
-        version: 11.4.3(typescript@5.8.3)
       axios:
         specifier: ^1.10.0
         version: 1.11.0
@@ -132,9 +117,6 @@ importers:
       morgan:
         specifier: ^1.10.0
         version: 1.10.1
-      superjson:
-        specifier: ^2.2.2
-        version: 2.2.2
       tsx:
         specifier: ^4.20.3
         version: 4.20.3
@@ -160,6 +142,9 @@ importers:
       '@types/node':
         specifier: ^24.0.4
         version: 24.1.0
+      '@types/uuid':
+        specifier: ^10.0.0
+        version: 10.0.0
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -1164,37 +1149,6 @@ packages:
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
     engines: {node: '>= 10'}
 
-  '@trpc/client@11.4.3':
-    resolution: {integrity: sha512-i2suttUCfColktXT8bqex5kHW5jpT15nwUh0hGSDiW1keN621kSUQKcLJ095blqQAUgB+lsmgSqSMmB4L9shQQ==}
-    peerDependencies:
-      '@trpc/server': 11.4.3
-      typescript: '>=5.7.2'
-
-  '@trpc/react-query@11.4.3':
-    resolution: {integrity: sha512-z+jhAiOBD22NNhHtvF0iFp9hO36YFA7M8AiUu/XtNmMxyLd3Y9/d1SMjMwlTdnGqxEGPo41VEWBrdhDUGtUuHg==}
-    peerDependencies:
-      '@tanstack/react-query': ^5.80.3
-      '@trpc/client': 11.4.3
-      '@trpc/server': 11.4.3
-      react: '>=18.2.0'
-      react-dom: '>=18.2.0'
-      typescript: '>=5.7.2'
-
-  '@trpc/server@11.4.3':
-    resolution: {integrity: sha512-wnWq3wiLlMOlYkaIZz+qbuYA5udPTLS4GVVRyFkr6aT83xpdCHyVtURT+u4hSoIrOXQM9OPCNXSXsAujWZDdaw==}
-    peerDependencies:
-      typescript: '>=5.7.2'
-
-  '@trpc/tanstack-react-query@11.4.3':
-    resolution: {integrity: sha512-aYPp12wE9IrakccGWoQU/waZuWr3FLw9RtagsqJmX9NKHpQOVzoDvHA1W0amwyTQSAfL98Bn5rWmD7KTdr5AWg==}
-    peerDependencies:
-      '@tanstack/react-query': ^5.80.3
-      '@trpc/client': 11.4.3
-      '@trpc/server': 11.4.3
-      react: '>=18.2.0'
-      react-dom: '>=18.2.0'
-      typescript: '>=5.7.2'
-
   '@types/axios@0.14.4':
     resolution: {integrity: sha512-9JgOaunvQdsQ/qW2OPmE5+hCeUB52lQSolecrFrthct55QekhmXEwT203s20RL+UHtCQc15y3VXpby9E7Kkh/g==}
     deprecated: This is a stub types definition. axios provides its own type definitions, so you do not need this installed.
@@ -1292,6 +1246,9 @@ packages:
 
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
+
+  '@types/uuid@10.0.0':
+    resolution: {integrity: sha512-7gqG38EyHgyP1S+7+xomFtL+ZNHcKv6DwNaCZmJmo1vgMugyF3TCnXVg4t1uk89mLNwnLtnY3TpOpCOyp1/xHQ==}
 
   '@types/yargs-parser@21.0.3':
     resolution: {integrity: sha512-I4q9QU9MQv4oEOz4tAHJtNz1cwuLxn2F3xcc2iV5WdqLPpUnj30aUuxt1mAxYTG+oe8CZMV/+6rU4S4gRDzqtQ==}
@@ -1672,10 +1629,6 @@ packages:
   cookie@0.7.2:
     resolution: {integrity: sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w==}
     engines: {node: '>= 0.6'}
-
-  copy-anything@3.0.5:
-    resolution: {integrity: sha512-yCEafptTtb4bk7GLEQoM8KVJpxAfdBJYaXyzQEgQQQgYrZiDp8SJmGKlYza6CYjEDNstAdNdKA3UuoULlEbS6w==}
-    engines: {node: '>=12.13'}
 
   core-js-compat@3.44.0:
     resolution: {integrity: sha512-JepmAj2zfl6ogy34qfWtcE7nHKAJnKsQFRn++scjVS2bZFllwptzw61BZcZFYBPpUznLfAvh0LGhxKppk04ClA==}
@@ -2258,10 +2211,6 @@ packages:
 
   is-promise@4.0.0:
     resolution: {integrity: sha512-hvpoI6korhJMnej285dSg6nu1+e6uxs7zG3BYAm5byqDsgJNWwxzM6z6iZiAgQR4TJ30JmBTOwqZUw3WlyH3AQ==}
-
-  is-what@4.1.16:
-    resolution: {integrity: sha512-ZhMwEosbFJkA0YhFnNDgTM4ZxDRsS6HqTo7qsZM08fehyRYIYa0yHu5R6mgo1n/8MgaPBXiPimPD77baVFYg+A==}
-    engines: {node: '>=12.13'}
 
   is-wsl@2.2.0:
     resolution: {integrity: sha512-fKzAra0rGJUUBwGBgNkHZuToZcn+TtXHpeCgmkMJMMYx1sQDYaCSyjJBSCa2nH1DGm7s3n1oBnohoVTBaN7Lww==}
@@ -3293,10 +3242,6 @@ packages:
     resolution: {integrity: sha512-8EbVDiu9iN/nESwxeSxDKe0dunta1GOlHufmSSXxMD2z2/tMZpDMpvXQGsc+ajGo8y2uYUmixaSRUc/QPoQ0GA==}
     engines: {node: '>=16 || 14 >=14.17'}
     hasBin: true
-
-  superjson@2.2.2:
-    resolution: {integrity: sha512-5JRxVqC8I8NuOUjzBbvVJAKNM8qoVuH0O77h4WInc/qC2q5IreqKxYwgkga3PfA22OayK2ikceb/B26dztPl+Q==}
-    engines: {node: '>=16'}
 
   supports-color@5.5.0:
     resolution: {integrity: sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow==}
@@ -4938,33 +4883,6 @@ snapshots:
 
   '@tootallnate/once@2.0.0': {}
 
-  '@trpc/client@11.4.3(@trpc/server@11.4.3(typescript@5.8.3))(typescript@5.8.3)':
-    dependencies:
-      '@trpc/server': 11.4.3(typescript@5.8.3)
-      typescript: 5.8.3
-
-  '@trpc/react-query@11.4.3(@tanstack/react-query@5.84.1(react@19.0.0))(@trpc/client@11.4.3(@trpc/server@11.4.3(typescript@5.8.3))(typescript@5.8.3))(@trpc/server@11.4.3(typescript@5.8.3))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.8.3)':
-    dependencies:
-      '@tanstack/react-query': 5.84.1(react@19.0.0)
-      '@trpc/client': 11.4.3(@trpc/server@11.4.3(typescript@5.8.3))(typescript@5.8.3)
-      '@trpc/server': 11.4.3(typescript@5.8.3)
-      react: 19.0.0
-      react-dom: 19.0.0(react@19.0.0)
-      typescript: 5.8.3
-
-  '@trpc/server@11.4.3(typescript@5.8.3)':
-    dependencies:
-      typescript: 5.8.3
-
-  '@trpc/tanstack-react-query@11.4.3(@tanstack/react-query@5.84.1(react@19.0.0))(@trpc/client@11.4.3(@trpc/server@11.4.3(typescript@5.8.3))(typescript@5.8.3))(@trpc/server@11.4.3(typescript@5.8.3))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.8.3)':
-    dependencies:
-      '@tanstack/react-query': 5.84.1(react@19.0.0)
-      '@trpc/client': 11.4.3(@trpc/server@11.4.3(typescript@5.8.3))(typescript@5.8.3)
-      '@trpc/server': 11.4.3(typescript@5.8.3)
-      react: 19.0.0
-      react-dom: 19.0.0(react@19.0.0)
-      typescript: 5.8.3
-
   '@types/axios@0.14.4':
     dependencies:
       axios: 1.11.0
@@ -5096,6 +5014,8 @@ snapshots:
   '@types/stack-utils@2.0.3': {}
 
   '@types/tough-cookie@4.0.5': {}
+
+  '@types/uuid@10.0.0': {}
 
   '@types/yargs-parser@21.0.3': {}
 
@@ -5544,10 +5464,6 @@ snapshots:
   cookie-signature@1.2.2: {}
 
   cookie@0.7.2: {}
-
-  copy-anything@3.0.5:
-    dependencies:
-      is-what: 4.1.16
 
   core-js-compat@3.44.0:
     dependencies:
@@ -6200,8 +6116,6 @@ snapshots:
   is-number@7.0.0: {}
 
   is-promise@4.0.0: {}
-
-  is-what@4.1.16: {}
 
   is-wsl@2.2.0:
     dependencies:
@@ -7407,10 +7321,6 @@ snapshots:
       mz: 2.7.0
       pirates: 4.0.7
       ts-interface-checker: 0.1.13
-
-  superjson@2.2.2:
-    dependencies:
-      copy-anything: 3.0.5
 
   supports-color@5.5.0:
     dependencies:

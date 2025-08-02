@@ -1,2 +1,2 @@
 export * from "./search";
-export * from "./trpc";
+export * from "./api/placeNote";

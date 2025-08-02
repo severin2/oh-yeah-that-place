@@ -11,11 +11,19 @@ export const searchRouter = Router();
 searchRouter.get(
   "/",
   async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { query, limit } = req.query as Record<string, string>;
+    const { query, limit } = req.query as Record<string, string>;
+    console.log(
+      `[${new Date().toISOString()}] GET /search - Searching for places with query: "${query}", limit: ${
+        limit || 10
+      }`
+    );
 
+    try {
       // Validate required parameters
       if (!query || typeof query !== "string" || !query.trim()) {
+        console.log(
+          `[${new Date().toISOString()}] GET /search - Validation failed: Query parameter missing or empty`
+        );
         const errorResponse: SearchResponse = {
           results: [],
           status: "INVALID_REQUEST",
@@ -28,6 +36,9 @@ searchRouter.get(
       // Parse and validate limit parameter
       const parsedLimit = limit ? parseInt(limit, 10) : 10;
       if (isNaN(parsedLimit) || parsedLimit < 1 || parsedLimit > 50) {
+        console.log(
+          `[${new Date().toISOString()}] GET /search - Validation failed: Invalid limit parameter: ${limit}`
+        );
         const errorResponse: SearchResponse = {
           results: [],
           status: "INVALID_REQUEST",

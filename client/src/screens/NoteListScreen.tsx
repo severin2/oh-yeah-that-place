@@ -6,18 +6,22 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
-import { useTRPC } from "../api/trpc";
-import { useQuery } from "@tanstack/react-query";
 import { useNavigation } from "@react-navigation/native";
-import { PlaceNote } from "@shared/trpc/placeNote";
-import type { RootStackParamList } from "@/navigation/TabNavigator";
+import { PlaceNote } from "@shared/api/placeNote";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { usePlaceNotes } from "../hooks/usePlaceNotes";
 
 export function NoteListScreen() {
-  const trpc = useTRPC();
-  const { data: notes, isLoading } = useQuery(
-    trpc.placeNote.getNotes.queryOptions()
-  );
-  const navigation = useNavigation<RootStackParamList>();
+  const { data: notes, isLoading, error } = usePlaceNotes();
+
+  type NotesStackParamList = {
+    List: undefined;
+    Details: { note: PlaceNote };
+    Add: undefined;
+  };
+
+  const navigation =
+    useNavigation<NativeStackNavigationProp<NotesStackParamList>>();
 
   const handleNotePress = (note: PlaceNote) => {
     navigation.push("Details", {
@@ -27,6 +31,12 @@ export function NoteListScreen() {
 
   if (isLoading) {
     return <Text style={styles.loading}>Loading notes...</Text>;
+  }
+
+  if (error) {
+    return (
+      <Text style={styles.error}>Error loading notes: {error.message}</Text>
+    );
   }
 
   return (
@@ -53,6 +63,11 @@ const styles = StyleSheet.create({
   loading: {
     padding: 20,
     fontSize: 16,
+  },
+  error: {
+    padding: 20,
+    fontSize: 16,
+    color: "red",
   },
   container: {
     padding: 16,

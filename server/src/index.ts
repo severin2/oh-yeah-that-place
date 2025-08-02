@@ -1,7 +1,5 @@
-import 'dotenv/config';
+import "dotenv/config";
 
-export { TrpcRouter } from './routes';
-
-import { start } from './app';
+import { start } from "./app";
 
 start();

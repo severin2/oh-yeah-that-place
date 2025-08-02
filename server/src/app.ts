@@ -1,23 +1,17 @@
-import express from 'express';
-import cors from 'cors';
-import { createExpressMiddleware } from '@trpc/server/adapters/express';
-import morgan from 'morgan';
-import { searchRouter, trpcRouter } from './routes';
+import express from "express";
+import cors from "cors";
+import morgan from "morgan";
+import { searchRouter } from "./routes/search";
+import { placeNoteRouter } from "./routes/placeNoteRest";
 
 export const app = express();
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
 
-app.use(
-  '/trpc',
-  createExpressMiddleware({
-    router: trpcRouter,
-    createContext: () => ({}),
-  })
-);
-
-app.use('/search', searchRouter);
+// REST API routes
+app.use("/search", searchRouter);
+app.use("/api/place-notes", placeNoteRouter);
 
 export const start = () => {
   const port = process.env.PORT || 4000;

@@ -1,11 +1,11 @@
-import { trpc } from '@/api/trpc';
-import { AddNoteModal } from '@/components/AddNoteModal';
-import { useNavigation } from '@react-navigation/native';
-import * as Location from 'expo-location';
-import React, { useEffect, useState } from 'react';
-import { Alert, Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
-import MapView, { LongPressEvent, Marker } from 'react-native-maps';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { AddNoteModal } from "@/components/AddNoteModal";
+import { useNavigation } from "@react-navigation/native";
+import * as Location from "expo-location";
+import React, { useEffect, useState } from "react";
+import { Alert, Modal, StyleSheet, TouchableOpacity, View } from "react-native";
+import MapView, { LongPressEvent, Marker } from "react-native-maps";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { usePlaceNotes, useCreatePlaceNote } from "../hooks/usePlaceNotes";
 
 enum ModalState {
   None,
@@ -14,10 +14,11 @@ enum ModalState {
 }
 
 export function MapScreen() {
-  const { data: notes, refetch: refetchNotes } = trpc.placeNote.getNotes.useQuery();
-  const addNote = trpc.placeNote.addNote.useMutation();
+  const { data: notes, refetch: refetchNotes } = usePlaceNotes();
+  const createNoteMutation = useCreatePlaceNote();
 
-  const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
+  const [location, setLocation] =
+    useState<Location.LocationObjectCoords | null>(null);
   const [regionReady, setRegionReady] = useState(false);
   const [selectedCoord, setSelectedCoord] = useState<{
     latitude: number;
@@ -29,8 +30,11 @@ export function MapScreen() {
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission denied', 'Location permission is required to use this feature.');
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission denied",
+          "Location permission is required to use this feature."
+        );
         return;
       }
 
@@ -54,21 +58,25 @@ export function MapScreen() {
     note,
     notifyEnabled,
     notifyDistance,
+    place,
   }: {
     title: string;
     note: string;
     notifyEnabled: boolean;
     notifyDistance: number;
+    place: import("@shared/search").SearchResult;
   }) => {
-    if (!selectedCoord) return;
+    // Use coordinates from the selected place
+    const latitude = place.geometry.location.lat;
+    const longitude = place.geometry.location.lng;
 
-    await addNote.mutateAsync({
+    await createNoteMutation.mutateAsync({
       title,
       note,
       notifyEnabled,
       notifyDistance,
-      latitude: selectedCoord.latitude,
-      longitude: selectedCoord.longitude,
+      latitude,
+      longitude,
     });
 
     await refetchNotes();
@@ -105,17 +113,21 @@ export function MapScreen() {
 
       <Modal
         visible={modalState !== ModalState.None}
-        animationType='slide'
+        animationType="slide"
         onRequestClose={() => setModalState(ModalState.None)}
       >
         <AddNoteModal
           onSubmit={handleSubmit}
           onCancel={() => setModalState(ModalState.None)}
-          submitting={addNote.isPending}
+          submitting={createNoteMutation.isPending}
         />
       </Modal>
-      <TouchableOpacity style={styles.fab} onPress={() => handleAddNotePress()} activeOpacity={0.7}>
-        <Ionicons name='add' size={32} color='#fff' />
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => handleAddNotePress()}
+        activeOpacity={0.7}
+      >
+        <Ionicons name="add" size={32} color="#fff" />
       </TouchableOpacity>
     </View>
   );
@@ -127,22 +139,22 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   input: {
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderWidth: 1,
     padding: 12,
     marginBottom: 12,
   },
   fab: {
-    position: 'absolute',
+    position: "absolute",
     right: 24,
     bottom: 32,
-    backgroundColor: '#007AFF',
+    backgroundColor: "#007AFF",
     borderRadius: 28,
     width: 56,
     height: 56,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,

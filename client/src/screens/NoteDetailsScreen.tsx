@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { RouteProp, useRoute } from "@react-navigation/native";
-import type { PlaceNote } from "@shared/trpc/index";
+import type { PlaceNote } from "@shared/api/placeNote";
 
 type RootStackParamList = {
   NoteDetails: { note: PlaceNote };
