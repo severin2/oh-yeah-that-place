@@ -49,6 +49,7 @@ searchRouter.get('/', async (req: Request, res: Response, next: NextFunction) =>
     // Search using Google Places API
     try {
       const results = await googlePlacesService.searchText(query.trim(), parsedLimit);
+      console.log(JSON.stringify(results, null, 2));
       const response: SearchResponse = {
         results,
         status: results.length > 0 ? 'OK' : 'ZERO_RESULTS',
