@@ -1,4 +1,5 @@
 import type { SearchResponse, SearchResult } from '@shared/search';
+import { getBaseUrl } from './vars';
 
 export async function searchPlaces(query: string): Promise<SearchResult[]> {
   if (!query?.trim()) {
@@ -10,7 +11,7 @@ export async function searchPlaces(query: string): Promise<SearchResult[]> {
     limit: '10', // Default limit
   });
 
-  const url = `${process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:4000'}/search?${params}`;
+  const url = `${getBaseUrl()}/search?${params}`;
 
   try {
     const res = await fetch(url);
@@ -45,9 +46,7 @@ export async function getPlaceByCoordinates(
     lng: longitude.toString(),
   });
 
-  const url = `${
-    process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:4000'
-  }/search/reverse?${params}`;
+  const url = `${getBaseUrl()}/search/reverse?${params}`;
 
   try {
     const res = await fetch(url);

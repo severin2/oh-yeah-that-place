@@ -9,7 +9,7 @@ export type SearchResult = {
   rating: number;
   userRatingCount: number;
   openingHours: { openNow: boolean };
-  photos: { photoReference: string }[];
+  photos: string[];
   icon: string;
   businessStatus: string;
   description: string;

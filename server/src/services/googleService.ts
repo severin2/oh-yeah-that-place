@@ -44,6 +44,10 @@ export class GooglePlacesService {
       },
     });
 
+    const places = response.places || [];
+    const photos: Record<string, []> = await Promise.all(
+      places.flatMap((place) => (place.photos || []).map((photo) => this.getMediaForPhoto(photo)))
+    );
     return this.transformPlaceResults(response.places || []);
   }
 
@@ -73,7 +77,15 @@ export class GooglePlacesService {
     return places.length > 0 ? this.transformPlaceResults(places)[0] : null;
   }
 
-  private transformPlaceResults(places: IPlace[]): SearchResult[] {
+  private getMediaForPhoto(photo: protos.google.maps.places.v1.IPhoto) {
+    return this.placesClient.getPhotoMedia({ name: photo.name });
+  }
+
+  private async transformPlaceResults(places: IPlace[]): Promise<SearchResult[]> {
+    const photos: Record<string, protos.google.maps.places.v1.IPhotoMedia[]> = await Promise.all(
+      places.flatMap((place) => (place.photos || []).map((photo) => this.getMediaForPhoto(photo)))
+    );
+
     return places.filter(placeHasId).map((place) => ({
       placeId: place.id,
       name: place.displayName?.text || '',
@@ -90,9 +102,7 @@ export class GooglePlacesService {
       openingHours: {
         openNow: place.currentOpeningHours?.openNow || false,
       },
-      photos: (place.photos || []).map((photo: any) => ({
-        photoReference: photo.name || '',
-      })),
+      photos: (place.photos || []).map((photo: protos.google.maps.places.v1.IPhoto) => photo.name),
       icon: place.iconMaskBaseUri || '',
       businessStatus: `${place.businessStatus}` || '',
       description: place.editorialSummary?.text || '',

@@ -41,7 +41,7 @@ export function AddNoteModal({
       if (search.trim()) {
         performSearch(search);
       }
-    }, 400); // 400ms debounce
+    }, 500);
     return () => clearTimeout(handler);
   }, [search, performSearch]);
 
@@ -110,10 +110,10 @@ export function AddNoteModal({
                         <FlatList
                           data={item.photos}
                           horizontal
-                          keyExtractor={(uri, idx) => uri.photoReference + idx}
+                          keyExtractor={(uri, idx) => uri + idx}
                           renderItem={({ item: photoUri }) => (
                             <Image
-                              source={{ uri: photoUri.photoReference }}
+                              source={{ uri: photoUri }}
                               style={{ width: 64, height: 64, marginRight: 8, borderRadius: 6 }}
                               resizeMode='cover'
                             />

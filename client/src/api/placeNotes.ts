@@ -6,16 +6,13 @@ import type {
   CreatePlaceNoteResponse,
   UpdatePlaceNoteResponse,
   DeletePlaceNoteResponse,
-} from "@shared/api/placeNote";
-
-const getBaseUrl = () => {
-  return process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000";
-};
+} from '@shared/api/placeNote';
+import { getBaseUrl } from './vars';
 
 class ApiError extends Error {
   constructor(message: string, public status?: number) {
     super(message);
-    this.name = "ApiError";
+    this.name = 'ApiError';
   }
 }
 
@@ -36,7 +33,7 @@ export const placeNoteApi = {
     const response = await fetch(`${getBaseUrl()}/api/place-notes`);
     const data = await handleApiResponse<GetPlaceNotesResponse>(response);
 
-    if (data.status === "error") {
+    if (data.status === 'error') {
       throw new ApiError(data.error);
     }
 
@@ -48,16 +45,16 @@ export const placeNoteApi = {
    */
   async createPlaceNote(input: CreatePlaceNoteInput): Promise<PlaceNote> {
     const response = await fetch(`${getBaseUrl()}/api/place-notes`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(input),
     });
 
     const data = await handleApiResponse<CreatePlaceNoteResponse>(response);
 
-    if (data.status === "error") {
+    if (data.status === 'error') {
       throw new ApiError(data.error);
     }
 
@@ -67,21 +64,18 @@ export const placeNoteApi = {
   /**
    * Update an existing place note
    */
-  async updatePlaceNote(
-    id: string,
-    input: UpdatePlaceNoteInput
-  ): Promise<PlaceNote> {
+  async updatePlaceNote(id: string, input: UpdatePlaceNoteInput): Promise<PlaceNote> {
     const response = await fetch(`${getBaseUrl()}/api/place-notes/${id}`, {
-      method: "PUT",
+      method: 'PUT',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(input),
     });
 
     const data = await handleApiResponse<UpdatePlaceNoteResponse>(response);
 
-    if (data.status === "error") {
+    if (data.status === 'error') {
       throw new ApiError(data.error);
     }
 
@@ -93,12 +87,12 @@ export const placeNoteApi = {
    */
   async deletePlaceNote(id: string): Promise<void> {
     const response = await fetch(`${getBaseUrl()}/api/place-notes/${id}`, {
-      method: "DELETE",
+      method: 'DELETE',
     });
 
     const data = await handleApiResponse<DeletePlaceNoteResponse>(response);
 
-    if (data.status === "error") {
+    if (data.status === 'error') {
       throw new ApiError(data.error);
     }
   },

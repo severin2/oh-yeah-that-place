@@ -1,11 +1,11 @@
-import { AddNoteModal } from "@/components/AddNoteModal";
-import { useNavigation } from "@react-navigation/native";
-import * as Location from "expo-location";
-import React, { useEffect, useState } from "react";
-import { Alert, Modal, StyleSheet, TouchableOpacity, View } from "react-native";
-import MapView, { LongPressEvent, Marker } from "react-native-maps";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import { usePlaceNotes, useCreatePlaceNote } from "../hooks/usePlaceNotes";
+import { AddNoteModal } from '@/components/AddNoteModal';
+import { useNavigation } from '@react-navigation/native';
+import * as Location from 'expo-location';
+import React, { useEffect, useState } from 'react';
+import { Alert, Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
+import MapView, { LongPressEvent, Marker } from 'react-native-maps';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { usePlaceNotes, useCreatePlaceNote } from '../hooks/usePlaceNotes';
 
 enum ModalState {
   None,
@@ -17,8 +17,7 @@ export function MapScreen() {
   const { data: notes, refetch: refetchNotes } = usePlaceNotes();
   const createNoteMutation = useCreatePlaceNote();
 
-  const [location, setLocation] =
-    useState<Location.LocationObjectCoords | null>(null);
+  const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
   const [regionReady, setRegionReady] = useState(false);
   const [selectedCoord, setSelectedCoord] = useState<{
     latitude: number;
@@ -30,11 +29,8 @@ export function MapScreen() {
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(
-          "Permission denied",
-          "Location permission is required to use this feature."
-        );
+      if (status !== 'granted') {
+        Alert.alert('Permission denied', 'Location permission is required to use this feature.');
         return;
       }
 
@@ -64,7 +60,7 @@ export function MapScreen() {
     note: string;
     notifyEnabled: boolean;
     notifyDistance: number;
-    place: import("@shared/search").SearchResult;
+    place: import('@shared/search').SearchResult;
   }) => {
     // Use coordinates from the selected place
     const latitude = place.geometry.location.lat;
@@ -113,7 +109,7 @@ export function MapScreen() {
 
       <Modal
         visible={modalState !== ModalState.None}
-        animationType="slide"
+        animationType='slide'
         onRequestClose={() => setModalState(ModalState.None)}
       >
         <AddNoteModal
@@ -122,12 +118,9 @@ export function MapScreen() {
           submitting={createNoteMutation.isPending}
         />
       </Modal>
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => handleAddNotePress()}
-        activeOpacity={0.7}
-      >
-        <Ionicons name="add" size={32} color="#fff" />
+
+      <TouchableOpacity style={styles.fab} onPress={() => handleAddNotePress()} activeOpacity={0.7}>
+        <Ionicons name='add' size={32} color='#fff' />
       </TouchableOpacity>
     </View>
   );
@@ -139,22 +132,22 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   input: {
-    borderColor: "#ccc",
+    borderColor: '#ccc',
     borderWidth: 1,
     padding: 12,
     marginBottom: 12,
   },
   fab: {
-    position: "absolute",
-    right: 24,
+    position: 'absolute',
+    left: 24,
     bottom: 32,
-    backgroundColor: "#007AFF",
+    backgroundColor: '#007AFF',
     borderRadius: 28,
     width: 56,
     height: 56,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,

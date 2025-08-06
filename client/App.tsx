@@ -1,12 +1,11 @@
-import React from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Navigation } from "@/navigation/TabNavigator";
-import { log, setLogEnabled } from "@/api/log";
+import React from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Navigation } from '@/navigation/TabNavigator';
+import { log, setLogEnabled } from '@/api/log';
 
 setLogEnabled(true); // Toggle logging on/off here
 
 function makeQueryClient() {
-  log("Creating new QueryClient");
   return new QueryClient({
     defaultOptions: {
       queries: {
@@ -25,8 +24,7 @@ function makeQueryClient() {
 
 let browserQueryClient: QueryClient | undefined = undefined;
 function getQueryClient() {
-  if (typeof window === "undefined") {
-    log("SSR: Creating new QueryClient");
+  if (typeof window === 'undefined') {
     // Server: always make a new query client
     return makeQueryClient();
   } else {
@@ -35,7 +33,6 @@ function getQueryClient() {
     // suspends during the initial render. This may not be needed if we
     // have a suspense boundary BELOW the creation of the query client
     if (!browserQueryClient) {
-      log("Browser: Creating new QueryClient");
       browserQueryClient = makeQueryClient();
     }
     return browserQueryClient;
