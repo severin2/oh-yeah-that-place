@@ -45,10 +45,7 @@ export class GooglePlacesService {
     });
 
     const places = response.places || [];
-    const photos: Record<string, []> = await Promise.all(
-      places.flatMap((place) => (place.photos || []).map((photo) => this.getMediaForPhoto(photo)))
-    );
-    return this.transformPlaceResults(response.places || []);
+    return this.transformPlacesToResults(response.places || []);
   }
 
   async searchByLocation(lat: number, lng: number): Promise<SearchResult | null> {
@@ -74,19 +71,24 @@ export class GooglePlacesService {
     });
 
     const places = response.places || [];
-    return places.length > 0 ? this.transformPlaceResults(places)[0] : null;
+    return places.length > 0 ? this.transformPlaceToResult(places[0]) : null;
   }
 
   private getMediaForPhoto(photo: protos.google.maps.places.v1.IPhoto) {
-    return this.placesClient.getPhotoMedia({ name: photo.name });
+    console.log('Fetching photo media for:', photo.name);
+    return this.placesClient.getPhotoMedia({ name: photo.name + '/media', maxHeightPx: 200 });
   }
 
-  private async transformPlaceResults(places: IPlace[]): Promise<SearchResult[]> {
-    const photos: Record<string, protos.google.maps.places.v1.IPhotoMedia[]> = await Promise.all(
-      places.flatMap((place) => (place.photos || []).map((photo) => this.getMediaForPhoto(photo)))
+  private async transformPlaceToResult(place: IPlace): Promise<SearchResult | null> {
+    const photos = await Promise.all(
+      (place.photos || []).map((photo) => this.getMediaForPhoto(photo))
     );
 
-    return places.filter(placeHasId).map((place) => ({
+    if (!placeHasId(place)) {
+      return null;
+    }
+
+    return {
       placeId: place.id,
       name: place.displayName?.text || '',
       types: place.types || [],
@@ -102,11 +104,18 @@ export class GooglePlacesService {
       openingHours: {
         openNow: place.currentOpeningHours?.openNow || false,
       },
-      photos: (place.photos || []).map((photo: protos.google.maps.places.v1.IPhoto) => photo.name),
+      photos: photos
+        .map(([photo]) => photo.photoUri)
+        .filter((uri): uri is string => typeof uri === 'string'),
       icon: place.iconMaskBaseUri || '',
       businessStatus: `${place.businessStatus}` || '',
       description: place.editorialSummary?.text || '',
-    }));
+    };
+  }
+
+  private async transformPlacesToResults(places: IPlace[]): Promise<SearchResult[]> {
+    const results = await Promise.all(places.map((place) => this.transformPlaceToResult(place)));
+    return results.filter((result): result is SearchResult => result !== null);
   }
 }
 

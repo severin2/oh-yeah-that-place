@@ -7,12 +7,11 @@ import {
   TouchableOpacity,
   Button,
   StyleSheet,
-  Image,
 } from 'react-native';
-import { NoteForm } from './NoteForm';
 import { usePlaceSearch } from '../hooks/usePlaceSearch';
 import { SearchResult } from '@shared/search';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { SearchResultItem } from './SearchResultItem';
+import { RadioGroup } from './RadioGroup';
 
 export function AddNoteModal({
   onSubmit,
@@ -83,47 +82,7 @@ export function AddNoteModal({
                   onPress={() => handleSelect(item)}
                   key={item.placeId}
                 >
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    {item.icon ? (
-                      <Image
-                        source={{ uri: item.icon + '.png' }}
-                        style={{ width: 32, height: 32, marginRight: 8 }}
-                        resizeMode='contain'
-                      />
-                    ) : (
-                      <Ionicons
-                        name='location-outline'
-                        size={32}
-                        color='#888'
-                        style={{ marginRight: 8 }}
-                      />
-                    )}
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.resultText}>{item.name}</Text>
-                      <Text style={styles.resultDescription}>{item.description}</Text>
-                      {typeof item.rating === 'number' && (
-                        <Text style={{ fontSize: 14, color: '#444', marginTop: 2 }}>
-                          ⭐ {item.rating} ({item.userRatingCount ?? 0} reviews)
-                        </Text>
-                      )}
-                      {Array.isArray(item.photos) && item.photos.length > 0 && (
-                        <FlatList
-                          data={item.photos}
-                          horizontal
-                          keyExtractor={(uri, idx) => uri + idx}
-                          renderItem={({ item: photoUri }) => (
-                            <Image
-                              source={{ uri: photoUri }}
-                              style={{ width: 64, height: 64, marginRight: 8, borderRadius: 6 }}
-                              resizeMode='cover'
-                            />
-                          )}
-                          style={{ marginTop: 8 }}
-                          showsHorizontalScrollIndicator={false}
-                        />
-                      )}
-                    </View>
-                  </View>
+                  <SearchResultItem searchResult={item} />
                 </TouchableOpacity>
               )}
               ListEmptyComponent={
@@ -139,13 +98,19 @@ export function AddNoteModal({
       ) : selectedPlace ? (
         <>
           <View style={styles.selectedRow}>
-            <Text style={styles.selectedText}>Selected: {selectedPlace.name}</Text>
             <Button title='Pick another' onPress={handlePickAnother} color='#007AFF' />
           </View>
-          <NoteForm
-            onSubmit={(data) => onSubmit({ ...data, place: selectedPlace })}
-            onCancel={onCancel}
-            submitting={submitting}
+          <SearchResultItem searchResult={selectedPlace} />
+          <Text>Remind me when</Text>
+          <RadioGroup
+            options={[
+              { label: 'I arrive here', value: 'arrive' },
+              { label: "I'm near here", value: 'near' },
+              { label: 'I leave here', value: 'leave' },
+              { label: "I've been here for ", value: 'stay' },
+            ]}
+            multiple={true}
+            changed={(value) => console.log(value)}
           />
         </>
       ) : null}

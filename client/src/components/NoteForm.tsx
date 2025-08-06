@@ -55,7 +55,7 @@ export function NoteForm({
   };
 
   return (
-    <View style={styles.container}>
+    <View>
       <TextInput
         placeholder='Title'
         style={styles.input}
@@ -127,10 +127,6 @@ export function NoteForm({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    marginTop: 80,
-    padding: 20,
-  },
   input: {
     borderColor: '#ccc',
     borderWidth: 1,
