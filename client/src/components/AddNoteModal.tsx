@@ -25,6 +25,7 @@ export function AddNoteModal({
   const [search, setSearch] = useState('');
   const [selectedPlace, setSelectedPlace] = useState<SearchResult | null>(null);
   const [showSearch, setShowSearch] = useState(true);
+  const [note, setNote] = useState('');
 
   const { results, loading, error, search: performSearch } = usePlaceSearch();
 
@@ -66,6 +67,8 @@ export function AddNoteModal({
     ],
     []
   );
+
+  const [remindWhen, setRemindWhen] = useState<string[]>(['arrive']);
 
   return (
     <View style={styles.container}>
@@ -121,7 +124,21 @@ export function AddNoteModal({
           </View>
           <View style={{ marginTop: 16 }}>
             <Text>Remind me when</Text>
-            <RadioGroup options={options} multiple={true} changed={(value) => console.log(value)} />
+            <RadioGroup
+              options={options}
+              multiple={true}
+              changed={setRemindWhen}
+              value={remindWhen}
+            />
+          </View>
+          <View style={{ marginTop: 16 }}>
+            <ClearableTextInput
+              style={styles.noteInput}
+              placeholder='Add a note (optional)'
+              value={note}
+              onChangeText={setNote}
+              multiline
+            />
           </View>
           <View style={styles.ctaContainer}>
             <Button
@@ -131,7 +148,7 @@ export function AddNoteModal({
                 selectedPlace &&
                 onSubmit({
                   title: selectedPlace.name,
-                  note: '',
+                  note,
                   notifyEnabled: false,
                   notifyDistance: 0,
                   place: selectedPlace,
@@ -199,6 +216,16 @@ const styles = StyleSheet.create({
   selectedText: {
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  noteInput: {
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 10,
+    minHeight: 48,
+    backgroundColor: '#f9f9f9',
+    marginBottom: 8,
+    textAlignVertical: 'top',
   },
   ctaContainer: {
     marginTop: 32,

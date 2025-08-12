@@ -5,30 +5,48 @@ export type RadioGroupOption = {
   label: React.ReactNode;
   value: string;
 };
-
 type RadioGroupProps = {
-  options: RadioGroupOption[];
-  changed: (value: string[]) => void;
+  options: { label: string; value: string }[];
+  changed: (value: string | string[]) => void;
   multiple?: boolean;
+  value?: string | string[];
+  initialSelected?: string | string[];
 };
 
-export function RadioGroup({ options, changed, multiple = false }: RadioGroupProps) {
-  const [selected, setSelected] = useState<string[]>([]);
+export function RadioGroup({
+  options,
+  changed,
+  multiple = false,
+  value,
+  initialSelected,
+}: RadioGroupProps) {
+  // Controlled: use value prop, Uncontrolled: use internal state
+  const getInitial = () => {
+    if (multiple) {
+      if (Array.isArray(initialSelected)) return initialSelected;
+      return [];
+    } else {
+      if (typeof initialSelected === 'string') return initialSelected;
+      return options.length > 0 ? options[0].value : null;
+    }
+  };
+  const [internalSelected, setInternalSelected] = useState<string | string[] | null>(getInitial());
+  const selected = value !== undefined ? value : internalSelected;
 
-  const handleValueChange = (value: string, checked: boolean) => {
+  const handleValueChange = (val: string, checked: boolean) => {
     if (multiple) {
       let newSelected: string[] = Array.isArray(selected) ? [...selected] : [];
       if (checked) {
-        if (!newSelected.includes(value)) newSelected.push(value);
+        if (!newSelected.includes(val)) newSelected.push(val);
       } else {
-        newSelected = newSelected.filter((v) => v !== value);
+        newSelected = newSelected.filter((v) => v !== val);
       }
-      setSelected(newSelected);
+      if (value === undefined) setInternalSelected(newSelected);
       changed(newSelected);
     } else {
       if (checked) {
-        setSelected([value]);
-        changed([value]);
+        if (value === undefined) setInternalSelected(val);
+        changed(val);
       }
     }
   };
@@ -40,9 +58,13 @@ export function RadioGroup({ options, changed, multiple = false }: RadioGroupPro
           <View
             style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
           >
-            {option.label}
+            <Text>{option.label}</Text>
             <Switch
-              value={selected.includes(option.value)}
+              value={
+                multiple
+                  ? Array.isArray(selected) && selected.includes(option.value)
+                  : selected === option.value
+              }
               onValueChange={(checked) => handleValueChange(option.value, checked)}
             />
           </View>
