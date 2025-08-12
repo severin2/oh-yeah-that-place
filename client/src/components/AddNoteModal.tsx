@@ -1,17 +1,11 @@
-import React, { useState } from 'react';
-import {
-  View,
-  TextInput,
-  FlatList,
-  Text,
-  TouchableOpacity,
-  Button,
-  StyleSheet,
-} from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { View, FlatList, Text, TouchableOpacity, Button, StyleSheet } from 'react-native';
+import { ClearableTextInput } from './ClearableTextInput';
 import { usePlaceSearch } from '../hooks/usePlaceSearch';
 import { SearchResult } from '@shared/search';
 import { SearchResultItem } from './SearchResultItem';
-import { RadioGroup } from './RadioGroup';
+import { RadioGroup, RadioGroupOption } from './RadioGroup';
+import { SearchResultPhotos } from './SearchResultPhotos';
 
 export function AddNoteModal({
   onSubmit,
@@ -34,19 +28,24 @@ export function AddNoteModal({
 
   const { results, loading, error, search: performSearch } = usePlaceSearch();
 
-  // Debounce search input
-  React.useEffect(() => {
-    const handler = setTimeout(() => {
-      if (search.trim()) {
-        performSearch(search);
-      }
-    }, 500);
-    return () => clearTimeout(handler);
-  }, [search, performSearch]);
-
+  // Search when input is submitted or after 3s of no typing
   const handleSearchChange = (text: string) => {
     setSearch(text);
   };
+
+  const handleSearchSubmit = () => {
+    if (search.trim()) {
+      performSearch(search);
+    }
+  };
+
+  React.useEffect(() => {
+    if (!search.trim()) return;
+    const timeout = setTimeout(() => {
+      performSearch(search);
+    }, 3000);
+    return () => clearTimeout(timeout);
+  }, [search, performSearch]);
 
   const handleSelect = (item: SearchResult) => {
     setSelectedPlace(item);
@@ -58,18 +57,34 @@ export function AddNoteModal({
     setSelectedPlace(null);
   };
 
+  const options: RadioGroupOption[] = useMemo(
+    () => [
+      { label: <Text>I arrive here</Text>, value: 'arrive' },
+      { label: <Text>I'm near here</Text>, value: 'near' },
+      { label: <Text>I leave here</Text>, value: 'leave' },
+      { label: <Text>I've been here for </Text>, value: 'stay' },
+    ],
+    []
+  );
+
   return (
     <View style={styles.container}>
       {showSearch ? (
         <>
-          <TextInput
+          <ClearableTextInput
             style={styles.input}
             placeholder='Search for a place...'
             value={search}
             onChangeText={handleSearchChange}
+            onSubmitEditing={handleSearchSubmit}
+            returnKeyType='search'
           />
           {loading ? (
-            <Text style={styles.loading}>Searching...</Text>
+            <View style={{ marginTop: 8 }}>
+              {[...Array(4)].map((_, idx) => (
+                <View key={idx} style={styles.skeletonResult} />
+              ))}
+            </View>
           ) : error ? (
             <Text style={styles.error}>{error}</Text>
           ) : (
@@ -101,17 +116,31 @@ export function AddNoteModal({
             <Button title='Pick another' onPress={handlePickAnother} color='#007AFF' />
           </View>
           <SearchResultItem searchResult={selectedPlace} />
-          <Text>Remind me when</Text>
-          <RadioGroup
-            options={[
-              { label: 'I arrive here', value: 'arrive' },
-              { label: "I'm near here", value: 'near' },
-              { label: 'I leave here', value: 'leave' },
-              { label: "I've been here for ", value: 'stay' },
-            ]}
-            multiple={true}
-            changed={(value) => console.log(value)}
-          />
+          <View style={{ marginTop: 16 }}>
+            <SearchResultPhotos photoNames={selectedPlace.photos || []} />
+          </View>
+          <View style={{ marginTop: 16 }}>
+            <Text>Remind me when</Text>
+            <RadioGroup options={options} multiple={true} changed={(value) => console.log(value)} />
+          </View>
+          <View style={styles.ctaContainer}>
+            <Button
+              title='Add to my places'
+              onPress={() =>
+                onSubmit &&
+                selectedPlace &&
+                onSubmit({
+                  title: selectedPlace.name,
+                  note: '',
+                  notifyEnabled: false,
+                  notifyDistance: 0,
+                  place: selectedPlace,
+                })
+              }
+              color='#34C759'
+              disabled={submitting}
+            />
+          </View>
         </>
       ) : null}
     </View>
@@ -128,7 +157,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 4,
-    padding: 12,
+    paddingLeft: 4,
     marginBottom: 12,
     backgroundColor: '#f9f9f9',
   },
@@ -136,15 +165,6 @@ const styles = StyleSheet.create({
     padding: 12,
     borderBottomColor: '#eee',
     borderBottomWidth: 1,
-  },
-  resultText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  resultDescription: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 2,
   },
   empty: {
     padding: 20,
@@ -163,6 +183,13 @@ const styles = StyleSheet.create({
     color: '#ff4444',
     fontSize: 16,
   },
+  skeletonResult: {
+    height: 56,
+    borderRadius: 6,
+    backgroundColor: '#e0e0e0',
+    marginBottom: 8,
+    opacity: 0.6,
+  },
   selectedRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -172,5 +199,9 @@ const styles = StyleSheet.create({
   selectedText: {
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  ctaContainer: {
+    marginTop: 32,
+    marginBottom: 8,
   },
 });

@@ -1,15 +1,6 @@
 import { SearchResult } from '@shared/search';
-import React, { useState } from 'react';
-import {
-  View,
-  TextInput,
-  FlatList,
-  Text,
-  TouchableOpacity,
-  Button,
-  StyleSheet,
-  Image,
-} from 'react-native';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
 export function SearchResultItem({ searchResult: item }: { searchResult: SearchResult }) {
   return (
@@ -25,23 +16,6 @@ export function SearchResultItem({ searchResult: item }: { searchResult: SearchR
         </View>
         <Text style={styles.resultDescription}>{item.description}</Text>
         <Text style={{ fontWeight: 'bold' }}>{item.formattedAddress}</Text>
-
-        {Array.isArray(item.photos) && item.photos.length > 0 && (
-          <FlatList
-            data={item.photos}
-            horizontal
-            keyExtractor={(uri, idx) => uri + idx}
-            renderItem={({ item: photoUri }) => (
-              <Image
-                source={{ uri: photoUri }}
-                style={{ width: 64, height: 64, marginRight: 8, borderRadius: 6 }}
-                resizeMode='cover'
-              />
-            )}
-            style={{ marginTop: 8 }}
-            showsHorizontalScrollIndicator={false}
-          />
-        )}
       </View>
     </View>
   );

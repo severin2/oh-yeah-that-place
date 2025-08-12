@@ -1,8 +1,13 @@
 import { useState } from 'react';
 import { Switch, Text, View } from 'react-native';
 
+export type RadioGroupOption = {
+  label: React.ReactNode;
+  value: string;
+};
+
 type RadioGroupProps = {
-  options: { label: string; value: string }[];
+  options: RadioGroupOption[];
   changed: (value: string[]) => void;
   multiple?: boolean;
 };
@@ -35,7 +40,7 @@ export function RadioGroup({ options, changed, multiple = false }: RadioGroupPro
           <View
             style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
           >
-            <Text>{option.label}</Text>
+            {option.label}
             <Switch
               value={selected.includes(option.value)}
               onValueChange={(checked) => handleValueChange(option.value, checked)}

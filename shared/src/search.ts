@@ -1,3 +1,5 @@
+import { protos } from '@googlemaps/places';
+
 export type SearchResult = {
   placeId: string;
   name: string;
@@ -13,6 +15,17 @@ export type SearchResult = {
   icon: string;
   businessStatus: string;
   description: string;
+};
+
+export type PhotoDetail = {
+  name: string;
+  uri: string;
+};
+
+export type PhotoDetailsResponse = {
+  photos: PhotoDetail[];
+  status: 'OK' | 'ZERO_RESULTS' | 'INVALID_REQUEST' | 'ERROR';
+  error?: string;
 };
 
 export type SearchResponse = {

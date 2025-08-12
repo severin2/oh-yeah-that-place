@@ -1,5 +1,8 @@
 import { PlacesClient, protos } from '@googlemaps/places';
-import { SearchResult } from '@shared/search';
+import { PhotoDetail, SearchResult } from '@shared/search';
+import { InMemoryPhotoCache } from './memoryCache';
+import { InMemorySearchCache } from './memoryCache';
+import chalk from 'chalk';
 
 type IPlace = protos.google.maps.places.v1.IPlace;
 type IPlaceWithId = IPlace & { id: string };
@@ -20,6 +23,9 @@ export class GooglePlacesService {
     'places.editorialSummary',
   ].join(',');
 
+  private photoCache = new InMemoryPhotoCache();
+  private searchCache = new InMemorySearchCache();
+
   constructor() {
     const apiKey = process.env.GOOGLE_API_KEY;
     if (!apiKey) {
@@ -31,6 +37,14 @@ export class GooglePlacesService {
   }
 
   async searchText(query: string, limit: number = 10): Promise<SearchResult[]> {
+    const cacheKey = JSON.stringify({ query, limit });
+    const cached = this.searchCache.get(cacheKey);
+    if (cached) {
+      console.info(chalk.green(`Search cache hit`));
+      return cached;
+    }
+    console.info(chalk.red(`Search cache miss`));
+
     const request = {
       textQuery: query,
       maxResultCount: limit,
@@ -44,8 +58,9 @@ export class GooglePlacesService {
       },
     });
 
-    const places = response.places || [];
-    return this.transformPlacesToResults(response.places || []);
+    const results = await this.transformPlacesToResults(response.places || []);
+    this.searchCache.set(cacheKey, results);
+    return results;
   }
 
   async searchByLocation(lat: number, lng: number): Promise<SearchResult | null> {
@@ -74,16 +89,33 @@ export class GooglePlacesService {
     return places.length > 0 ? this.transformPlaceToResult(places[0]) : null;
   }
 
-  private getMediaForPhoto(photo: protos.google.maps.places.v1.IPhoto) {
-    console.log('Fetching photo media for:', photo.name);
-    return this.placesClient.getPhotoMedia({ name: photo.name + '/media', maxHeightPx: 200 });
+  public async getPhotos(photoNames: string[], maxHeightPx: number = 800) {
+    const cacheKey = JSON.stringify({ photoNames, maxHeightPx });
+    const cached = this.photoCache.get(cacheKey);
+    if (cached) {
+      console.info(chalk.green(`Photos cache hit`));
+      return cached;
+    }
+    console.info(chalk.red(`Photos cache miss`));
+
+    const photos: PhotoDetail[] = [];
+    for (let photoName of photoNames) {
+      const photo = await this.placesClient.getPhotoMedia({
+        name: photoName + '/media',
+        maxHeightPx,
+      });
+      if (photo.length) {
+        photos.push({
+          name: photo[0].name || '',
+          uri: photo[0].photoUri || '',
+        });
+      }
+    }
+    this.photoCache.set(cacheKey, photos);
+    return photos;
   }
 
   private async transformPlaceToResult(place: IPlace): Promise<SearchResult | null> {
-    const photos = await Promise.all(
-      (place.photos || []).map((photo) => this.getMediaForPhoto(photo))
-    );
-
     if (!placeHasId(place)) {
       return null;
     }
@@ -104,9 +136,7 @@ export class GooglePlacesService {
       openingHours: {
         openNow: place.currentOpeningHours?.openNow || false,
       },
-      photos: photos
-        .map(([photo]) => photo.photoUri)
-        .filter((uri): uri is string => typeof uri === 'string'),
+      photos: (place.photos || []).map((p) => p.name || ''),
       icon: place.iconMaskBaseUri || '',
       businessStatus: `${place.businessStatus}` || '',
       description: place.editorialSummary?.text || '',

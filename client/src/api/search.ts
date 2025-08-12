@@ -1,5 +1,40 @@
-import type { SearchResponse, SearchResult } from '@shared/search';
+import type {
+  PhotoDetail,
+  PhotoDetailsResponse,
+  SearchResponse,
+  SearchResult,
+} from '@shared/search';
 import { getBaseUrl } from './vars';
+
+export async function loadPhotoDetails(photos: string[]): Promise<PhotoDetail[]> {
+  if (!photos || photos.length === 0) {
+    throw new Error('Photo names cannot be empty');
+  }
+
+  const url = `${getBaseUrl()}/search/photos`;
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ photos }),
+    });
+    const data = (await res.json()) as PhotoDetailsResponse;
+
+    if (!res.ok || data.status === 'ERROR') {
+      throw new Error(data.error || `Failed to load photos with status ${res.status}`);
+    }
+
+    return data.photos;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Failed to load photos');
+  }
+}
 
 export async function searchPlaces(query: string): Promise<SearchResult[]> {
   if (!query?.trim()) {

@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { SearchResponse, ReverseGeocodeResponse } from '@shared/search';
+import { SearchResponse, ReverseGeocodeResponse, PhotoDetailsResponse } from '@shared/search';
 import { googlePlacesService } from '../services/googleService';
 
 export const searchRouter = Router();
@@ -10,18 +10,10 @@ export const searchRouter = Router();
  */
 searchRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
   const { query, limit } = req.query as Record<string, string>;
-  console.log(
-    `[${new Date().toISOString()}] GET /search - Searching for places with query: "${query}", limit: ${
-      limit || 10
-    }`
-  );
 
   try {
     // Validate required parameters
     if (!query || typeof query !== 'string' || !query.trim()) {
-      console.log(
-        `[${new Date().toISOString()}] GET /search - Validation failed: Query parameter missing or empty`
-      );
       const errorResponse: SearchResponse = {
         results: [],
         status: 'INVALID_REQUEST',
@@ -34,9 +26,6 @@ searchRouter.get('/', async (req: Request, res: Response, next: NextFunction) =>
     // Parse and validate limit parameter
     const parsedLimit = limit ? parseInt(limit, 10) : 10;
     if (isNaN(parsedLimit) || parsedLimit < 1 || parsedLimit > 50) {
-      console.log(
-        `[${new Date().toISOString()}] GET /search - Validation failed: Invalid limit parameter: ${limit}`
-      );
       const errorResponse: SearchResponse = {
         results: [],
         status: 'INVALID_REQUEST',
@@ -49,14 +38,12 @@ searchRouter.get('/', async (req: Request, res: Response, next: NextFunction) =>
     // Search using Google Places API
     try {
       const results = await googlePlacesService.searchText(query.trim(), parsedLimit);
-      console.log(JSON.stringify(results, null, 2));
       const response: SearchResponse = {
         results,
         status: results.length > 0 ? 'OK' : 'ZERO_RESULTS',
       };
       res.json(response);
     } catch (error) {
-      console.error('Google Places API error:', JSON.stringify(error, null, 2));
       const response: SearchResponse = {
         results: [],
         status: 'ERROR',
@@ -67,6 +54,37 @@ searchRouter.get('/', async (req: Request, res: Response, next: NextFunction) =>
     }
   } catch (error) {
     next(error);
+  }
+});
+
+searchRouter.post('/photos', async (req: Request, res: Response, next: NextFunction) => {
+  const { photos } = req.body as { photos: string[] };
+
+  try {
+    if (!Array.isArray(photos) || photos.length === 0) {
+      const errorResponse: PhotoDetailsResponse = {
+        photos: [],
+        status: 'INVALID_REQUEST',
+        error: `Parameter 'photos' is required and cannot be empty`,
+      };
+      res.status(400).json(errorResponse);
+      return;
+    }
+
+    const photoDetails = await googlePlacesService.getPhotos(photos);
+    const response: PhotoDetailsResponse = {
+      photos: photoDetails,
+      status: photoDetails ? 'OK' : 'ZERO_RESULTS',
+    };
+    res.json(response);
+  } catch (error) {
+    const response: PhotoDetailsResponse = {
+      photos: [],
+      status: 'ERROR',
+      error: 'Failed to fetch search results',
+    };
+    res.status(500).json(response);
+    return;
   }
 });
 
@@ -102,7 +120,6 @@ searchRouter.get('/reverse', async (req: Request, res: Response, next: NextFunct
       res.json(response);
       return;
     } catch (error) {
-      console.error('Google Places API error:', error);
       const response: ReverseGeocodeResponse = {
         result: null,
         status: 'ERROR',
